@@ -7,12 +7,12 @@
 
 form Enter information
 	comment Participant ID (folder with .wav files):
-	sentence fileID bi01
+	sentence fileID ne03
 endform
 
 
 #
-# Enter the path to where the files are kept -------------------
+# Enter the path to where the files are kept /Users/jorgevargasmutizabal/Desktop/pa_4/recordings/ne03/wavs
 #
 
 dirFiles$ = "../recordings/"+fileID$+"/wavs/"
@@ -56,7 +56,7 @@ clearinfo
 # Begin loop ---------------------------------------------------
 #
 
-for i from number to XXXXX
+for i from number to numberOfFiles
 	select Strings allFiles
 	fileName$ = Get string... i
 	prefix$ = fileName$ - ".wav"

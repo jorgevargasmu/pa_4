@@ -4,23 +4,17 @@ output: github_document
 
 ---
 
-**Author**: Your name here  
+**Author**: Jorge Vargas-Mutizabal 
 **Date**: Last update: `r Sys.time()`
 
 
 # Overview
 
 <!-- 
-  Talk briefly about what you did here 
-  Describe your hypotheses
+  
 -->
 
-Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod
-tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
-quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo
-consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse
-cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non
-proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+Los valores de VOT para los hablantes bilingüe serán más cortos que los de los hablantes de español como segunda lengua. En cuanto a los valores de F1 y F2, éstos serán mayores para los hablantes de español como L2 porque la vocal se proyecta con más intensidad, mientras que para los hablantes bilingües, las formantes tendrán valores menores por la razón contraria. 
 
 
 # Prep
@@ -28,10 +22,8 @@ proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
 ## Libraries
 
 ```{r}
-#| label: load-libs
-#| echo: false 
-#| warning: false 
-#| message: false
+library("tidyverse")
+
 # Load libraries here
 
 ```
@@ -42,16 +34,25 @@ proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
 #| label: load-data
 # You need to get all the files in the 'data' directory and combine them
 # Check previous examples we did in class 
+data <- list.files(path="../data", full.names = TRUE) %>%
+  lapply(read_csv) %>%
+  bind_rows
 
 ```
 
 ## Tidy data
 
 ```{r}
+data2 <- data %>%
+  separate("fileID", c("ID","Word")) %>%
+  select(-c(notes,data)) %>%
+  na.omit()
+
 #| label: tidy-data
 # Convert from long to wide or wide to long format as necessary (check 
 # examples from class)
 # Create any other relevant variables here 
+
 
 ```
 
@@ -64,6 +65,18 @@ proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
 # Give some descriptive summaries of your data 
 # Display your descriptives in a table (try knitr::kable())
 
+means <- data2 |>
+  group_by(ID)|>
+  summarize(avg_f1 = mean(f1),
+            sd_f1 = sd(f1),
+            avg_f2 = mean(f2),
+            sd_f2 = sd(f2),
+            avg_vot = mean(vot),
+            sd_vot = sd(vot))
+
+knitr::kable(means)
+
+
 ```
 
 ## Visualization
@@ -73,21 +86,42 @@ proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
 #| fig.retina: 2
 # Include some plots here
 
+data2 %>%
+  ggplot() +
+  aes(x = ID , y = f1 ) +
+geom_boxplot(fill = "green") +
+  labs(
+    subtitle = "F1 Grouped by ID",
+    x="ID",
+    Y="F1")
+    
+data2 %>%
+  ggplot() +
+  aes(x = ID , y = f2 ) +
+geom_boxplot(fill = "blue") +
+  labs(
+    subtitle = "F2 Grouped by ID",
+    x="ID",
+    Y="F2")
+
+data2 %>%
+  ggplot() +
+  aes(x = ID , y = vot ) +
+geom_boxplot(fill = "red") +
+  labs(
+    subtitle = "VOT Grouped by ID",
+    x="ID",
+    Y="VOT")
 ```
 
-<!-- 
-Also include a professional looking figure illustrating an example of the acoustics 
-of the production data, i.e., a plot generated in praat.
-You decide what is relevant (something related to your hypothesis). 
-Think about where this file should be located in your project. 
-What location makes most sense in terms of organization? 
-How will you access the file (path) from this .Rmd file?
-If you need help consider the following sources: 
-  - Search 'Rmarkdown image' on google, stackoverflow, etc.
-  - Search the 'knitr' package help files in RStudio
-  - Search the internet for HTML code (not recommended, but it works)
-  - Check the code from my class presentations (may or may not be helpful)
--->
+
+```{r}
+ 
+praatpicture::praatpicture("bi01_kaka.wav")
+
+```
+
+
 
 ## Hypothesis test
 
@@ -109,11 +143,9 @@ What did you enjoy? What did you hate? What did you learn?
 What would you do differently?
 -->
 
-Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod
-tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
-quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo
-consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse
-cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non
-proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
-
+ En concordancia con la hipótesis, el plot verde muestra que los valores de F1 son mayores para los hablantes de L2. Sin embargo, para los valores de F2, el plot azul muestra que los valores son mayores para casi todos los hablantes de L2, menos para n03, cuyos valores son más similares al de los hablantes bilingües. Por último, el plot rojo muestra que los valores de VOT para los bilingües no superan los 50ms, y para los hablantes de L2 bordean los 50 ms, lo que concuerda con hipótesis. 
+ 
+ El proceso del PA4 fue largo, pero muy productivo porque puedo usar secciones del script 1 para cuando tenga que hacer el textgrid de muchos archivos de sonido, y el 2 para cuando tenga que segmentar algo, y por supuesto si es que alguna vez tuviere que hacer medición de VOT, ahora tengo todas las herramientas para hacerlo. También, la tarea de buscar el error en los scripts fue interesante porque me permitió entender mejor cómo funcionan, y ahora tengo las herramientas para arreglar otros en el futuro. 
+ 
+ El proceso de R fue un poco más difícil porque aún es una herramienta nueva para mí, pero creo que ahora pude entender mejor sus mecanismos, y seguro van a ser muy útiles en el futuro. La tarea de hacer plots con promedios me gustó mucho porque es aplicable a muchas tareas en la que necesitemos observar patrones. 
 </br></br>
